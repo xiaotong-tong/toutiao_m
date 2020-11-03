@@ -1,7 +1,11 @@
 @import "icon";
+body {
+  background-color: #f5f7f9;
+}
 .van-nav-bar {
   background-color: #3296fa;
-  .van-nav-bar__title {
+  .van-nav-bar__title,
+  .van-nav-bar__left .van-icon-arrow-left.van-icon-arrow-left{
     color: #fff;
   }
 }

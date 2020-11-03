@@ -3,6 +3,8 @@
 <!--  导航栏 -->
   <van-nav-bar
     title="登录"
+    left-arrow
+    @click-left="$router.back()"
   />
 <!--  /导航栏 -->
 <!--  登陆表单 -->
@@ -46,8 +48,8 @@ export default {
   data () {
     return {
       userInfo: {
-        mobile: '',
-        code: ''
+        mobile: '13911111111',
+        code: '246810'
       },
       userFormRules: {
         mobile: [{
@@ -76,8 +78,9 @@ export default {
       })
       try {
         const data = await login(this.userInfo)
-        console.log(data)
+        this.$store.commit('setUser', data.data.data)
         this.$toast.success('登录成功')
+        this.$router.push('/my')
       } catch (err) {
         if (err.response.status === 400) {
           this.$toast.fail('验证码错误')
