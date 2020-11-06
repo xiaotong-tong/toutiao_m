@@ -3,9 +3,10 @@
 <!--  导航栏 -->
   <van-nav-bar
     title="登录"
-    left-arrow
-    @click-left="$router.back()"
-  />
+  ><template #left>
+    <span  v-if="$store.state.routerBackFlag" @click="$router.back()" class="toutiao toutiao-guanbi" style="color: #fff"></span>
+  </template>
+    </van-nav-bar>
 <!--  /导航栏 -->
 <!--  登陆表单 -->
   <van-form @submit="onSubmit" ref="userFormRef">
@@ -77,11 +78,13 @@ export default {
         forbidClick: true
       })
       try {
+        console.log(1)
         const data = await login(this.userInfo)
         this.$store.commit('setUser', data.data.data)
         this.$toast.success('登录成功')
         this.$router.push('/my')
       } catch (err) {
+        console.log(err)
         if (err.response.status === 400) {
           this.$toast.fail('验证码错误')
         } else {

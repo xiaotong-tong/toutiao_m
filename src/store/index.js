@@ -6,7 +6,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: getItem('token_user')
+    user: getItem('token_user'),
+    routerBackFlag: false
   },
   mutations: {
     setUser (state, data) {
