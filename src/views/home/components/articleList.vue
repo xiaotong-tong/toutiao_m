@@ -15,7 +15,8 @@
         error-text="请求失败，点击重新加载"
         @load="onLoad"
       >
-        <van-cell v-for="(item,index) in list" :key="index" :title="item.title"/>
+<!--        <van-cell v-for="(item,index) in list" :key="index" :title="item.title"/>-->
+        <article-item :article="item" v-for="(item, index) in list" :key="index"></article-item>
       </van-list>
     </van-pull-refresh>
   </div>
@@ -23,6 +24,7 @@
 
 <script>
 import { getChannels } from '@/api/atricle'
+import articleItem from '@/components/articleItem'
 export default {
   name: 'articleList',
   props: {
@@ -42,6 +44,9 @@ export default {
       successText: ''
     }
   },
+  components: {
+    'article-item': articleItem
+  },
   methods: {
     async onLoad () {
       // 异步更新数据
@@ -51,7 +56,6 @@ export default {
           timestamp: this.timestamp || +new Date(),
           with_top: 0
         })
-        console.log(data)
         this.list.push(...data.data.results)
         this.loading = false
         if (data.data.results.length) {

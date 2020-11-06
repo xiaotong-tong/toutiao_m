@@ -11,7 +11,8 @@ import 'vant/lib/index.css'
 import './style/index.scss'
 // 导入flexible
 import 'amfe-flexible'
-
+// 导入dayjs
+import './utibs/dayjs'
 Vue.use(Vant)
 Vue.config.productionTip = false
 

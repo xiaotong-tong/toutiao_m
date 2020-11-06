@@ -10,22 +10,27 @@
         <article-list :channel="item"></article-list>
       </van-tab>
       <div slot="nav-right" class="placeholder"></div>
-      <div slot="nav-right" class="hamburger_btn">
+      <div slot="nav-right" class="hamburger_btn" @click="showChannelPopup = true">
         <i class="toutiao toutiao-gengduo"></i>
       </div>
     </van-tabs>
+    <van-popup v-model="showChannelPopup" position="bottom" :style="{ height: '100%' }"  closeable close-icon-position="top-left">
+      <article-edit :channels="channel" :active="active" @changeActive="changeAct"></article-edit>
+    </van-popup>
   </div>
 </template>
 
 <script>
 import { getUserChannelList } from '@/api/user'
 import articleList from './components/articleList'
+import articleEdit from '@/views/home/components/articleEdit'
 export default {
   name: 'home',
   data () {
     return {
       active: 0,
-      channel: []
+      channel: [],
+      showChannelPopup: false
     }
   },
   methods: {
@@ -37,13 +42,17 @@ export default {
       } catch (e) {
         this.$toast('获取频道列表失败')
       }
+    },
+    changeAct (index) {
+      this.active = index
     }
   },
   created () {
     this.getUserChannels()
   },
   components: {
-    articleList: articleList
+    articleList,
+    articleEdit
   }
 }
 </script>
@@ -76,6 +85,7 @@ export default {
     top: 92px;
     z-index: 2;
     height: 82px;
+    width: 100%;
   }
   .van-tab {
     min-width: 200px;
@@ -105,6 +115,9 @@ export default {
   .placeholder {
     flex: 0 0 66px;
     height: 82px;
+  }
+  .van-tabs__content {
+    min-height: 75vh;
   }
 }
 </style>
