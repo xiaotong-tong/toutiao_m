@@ -3,7 +3,7 @@ export const setItem = (k, v) => {
   if (typeof v === 'object') {
     v = JSON.stringify(v)
   }
-  localStorage.setItem('token_user', v)
+  localStorage.setItem(k, v)
 }
 // 获取数据
 export const getItem = k => {

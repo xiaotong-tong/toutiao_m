@@ -5,7 +5,7 @@
       <van-button class="edit_btn" type="danger" round plain size="small" @click="isEdit = !isEdit">{{ isEdit ? '完成' : '编辑' }}</van-button>
     </van-cell>
     <van-grid :gutter="10" :column-num="4">
-      <van-grid-item v-for="(channel, i) in channels" :key="channel.id" @click="editMychannel(i)">
+      <van-grid-item v-for="(channel, i) in channels" :key="channel.id" @click="editMychannel(i, channel)">
         <span slot="text" :class="active === i ? 'active_red' : ''">{{ channel.name }}</span>
         <van-icon name="close" slot="icon" class="close_icon" v-show="isEdit && !fixedChanges.includes(channel.id)"/>
       </van-grid-item>
@@ -21,7 +21,9 @@
 </template>
 
 <script>
-import { getAllChannels } from '@/api/channel'
+import { getAllChannels, addUserAllChannels, delUserAllChannels } from '@/api/channel'
+import { mapState } from 'vuex'
+import { setItem } from '@/utibs/storage'
 
 export default {
   name: 'articleEdit',
@@ -51,20 +53,49 @@ export default {
         this.$toast('获取频道失败')
       }
     },
-    addMychannels (val) {
-      this.channels.push(val)
-    },
-    editMychannel (index) {
-      if (this.isEdit) {
-        if (index === 0) {
-          return
-        }
-        this.channels.splice(index, 1)
-        if (this.active >= index) {
-          this.$emit('changeActive', this.active - 1)
+    async addMychannels (channel) {
+      this.channels.push(channel)
+      if (this.user) {
+        // 登陆状态下的数据持久化
+        try {
+          await addUserAllChannels({
+            id: channel.id,
+            seq: this.channels.length
+          })
+        } catch (err) {
+          this.$toast('新增频道失败')
         }
       } else {
-        this.$emit('changeActive', index)
+        // 未登陆状态下的数据持久化
+        setItem('channels', this.channels)
+      }
+    },
+    editMychannel (index, channel) {
+      if (this.isEdit) {
+        if (channel.id === 0) {
+          return
+        }
+        const i = this.channels.findIndex(item => {
+          return item.id === channel.id
+        })
+        this.channels.splice(i, 1)
+        if (this.active >= i) {
+          this.$emit('changeActive', this.active - 1)
+        }
+        this.removeSetStorage(channel)
+      } else {
+        this.$emit('changeActive', index, false)
+      }
+    },
+    async removeSetStorage (channel) {
+      if (this.user) {
+        try {
+          await delUserAllChannels(channel.id)
+        } catch (e) {
+          this.$toast('删除频道失败')
+        }
+      } else {
+        setItem('channels', this.channels)
       }
     }
   },
@@ -73,7 +104,8 @@ export default {
       return this.allChannels.filter(item => {
         return !this.channels.find(channel => channel.id === item.id)
       })
-    }
+    },
+    ...mapState(['user'])
   },
   created () {
     this.loadChannels()

@@ -1,7 +1,7 @@
 <template>
   <div class="home_container">
     <van-nav-bar fixed>
-      <van-button type="info" slot="title" class="search-btn" icon="search" size="small" round>
+      <van-button type="info" slot="title" class="search-btn" icon="search" size="small" round to="/search">
         搜索
       </van-button>
     </van-nav-bar>
@@ -24,6 +24,9 @@
 import { getUserChannelList } from '@/api/user'
 import articleList from './components/articleList'
 import articleEdit from '@/views/home/components/articleEdit'
+import { mapState } from 'vuex'
+import { getItem } from '@/utibs/storage'
+
 export default {
   name: 'home',
   data () {
@@ -36,15 +39,26 @@ export default {
   methods: {
     async getUserChannels () {
       try {
-        const { data } = await getUserChannelList()
-        console.log(data)
-        this.channel = data.data.channels
+        if (this.user) {
+          const { data } = await getUserChannelList()
+          this.channel = data.data.channels
+        } else {
+          if (getItem('channels')) {
+            this.channel = getItem('channels')
+          } else {
+            const { data } = await getUserChannelList()
+            this.channel = data.data.channels
+          }
+        }
       } catch (e) {
         this.$toast('获取频道列表失败')
       }
     },
-    changeAct (index) {
+    changeAct (index, flag) {
       this.active = index
+      if (flag === false) {
+        this.showChannelPopup = false
+      }
     }
   },
   created () {
@@ -53,6 +67,9 @@ export default {
   components: {
     articleList,
     articleEdit
+  },
+  computed: {
+    ...mapState(['user'])
   }
 }
 </script>

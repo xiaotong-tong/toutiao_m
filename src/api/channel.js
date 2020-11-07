@@ -6,3 +6,18 @@ export const getAllChannels = () => {
     method: 'get'
   })
 }
+export const addUserAllChannels = (channel) => {
+  return request({
+    url: '/app/v1_0/user/channels',
+    method: 'PATCH',
+    data: {
+      channels: [channel]
+    }
+  })
+}
+export const delUserAllChannels = (channelID) => {
+  return request({
+    url: '/app/v1_0/user/channels/' + channelID,
+    method: 'DELETE'
+  })
+}
