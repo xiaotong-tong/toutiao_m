@@ -13,6 +13,7 @@ import './style/index.scss'
 import 'amfe-flexible'
 // 导入dayjs
 import './utibs/dayjs'
+import 'github-markdown-css'
 Vue.use(Vant)
 Vue.config.productionTip = false
 

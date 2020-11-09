@@ -1,6 +1,6 @@
 <template>
 <div class="article-item">
-  <van-cell>
+  <van-cell :to="'/article/' + article.art_id">
     <span slot="title" class="title">{{article.title}}</span>
     <div class="pics" v-if="article.cover.type === 3" slot="label">
       <van-image class="picsimg" v-for="(item, i) in article.cover.images" :key="i" :src="item"/>

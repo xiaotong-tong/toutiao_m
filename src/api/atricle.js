@@ -7,3 +7,9 @@ export const getChannels = params => {
     params
   })
 }
+export const getArticleByID = id => {
+  return request({
+    url: `/app/v1_0/articles/${id}`,
+    method: 'get'
+  })
+}

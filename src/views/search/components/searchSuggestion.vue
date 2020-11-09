@@ -1,6 +1,6 @@
 <template>
 <div class="search-suggestion-container">
-  <van-cell icon="search" v-for="(item,i) in suggestionList" :key="i">
+  <van-cell icon="search" v-for="(item,i) in suggestionList" :key="i" @click="cellClick(item)">
     <div slot="title" v-html="htmlText(item)"></div>
   </van-cell>
 </div>
@@ -42,6 +42,9 @@ export default {
       const exp = new RegExp(this.searchText, 'ig')
       const str = `<span class="active">${this.searchText}</span>`
       return text.replace(exp, str)
+    },
+    cellClick (val) {
+      this.$emit('search', val)
     }
   }
 }
