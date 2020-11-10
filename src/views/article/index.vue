@@ -1,5 +1,5 @@
 <template>
-  <div class="article-container markdown-body">
+  <div class="article-container markdown-body" ref="articleRefs">
     <!-- 导航栏 -->
     <van-nav-bar class="page-nav-bar" left-arrow title="黑马头条" @click-left="$router.back()"></van-nav-bar>
 
@@ -24,27 +24,25 @@
             :src="articleInfo.aut_photo"
           />
           <div slot="title" class="user-name">{{ articleInfo.aut_name }}</div>
-          <div slot="label" class="publish-date">{{ articleInfo.pubdate || relativeTime }}</div>
-          <van-button
-            class="follow-btn"
-            type="info"
-            color="#3296fa"
-            round
-            size="small"
-            icon="plus"
-          >关注</van-button>
-          <!-- <van-button
-            class="follow-btn"
-            round
-            size="small"
-          >已关注</van-button>-->
+          <div slot="label" class="publish-date">{{ articleInfo.pubdate | relativeTime }}</div>
+          <follow-user :articleInfo="articleInfo" @followChange="followUpdata"></follow-user>
         </van-cell>
 
         <!-- 文章内容 -->
         <div class="article-content" v-html="articleInfo.content"></div>
         <van-divider>正文结束</van-divider>
+<!--        评论组件 -->
+        <comment-list :art_id="articleInfo.art_id" @getTotal="getTotalCount"></comment-list>
+        <!-- 底部区域 -->
+        <div class="article-bottom">
+          <van-button class="comment-btn" type="default" round size="small">写评论</van-button>
+          <van-icon name="comment-o" :info="totalCount" color="#777" />
+          <!--      收藏 -->
+          <collect-article v-model="articleInfo.is_collected" :art_id="articleInfo.art_id"></collect-article>
+          <good-job-article v-model="articleInfo.attitude" :art_id="articleInfo.art_id"></good-job-article>
+          <van-icon name="share" color="#777777"></van-icon>
+        </div>
       </div>
-
       <!-- 加载失败：404 -->
       <div class="error-wrap" v-else-if="status">
         <van-icon name="failure" />
@@ -58,28 +56,24 @@
         <van-button class="retry-btn">点击重试</van-button>
       </div>
     </div>
-
-    <!-- 底部区域 -->
-    <div class="article-bottom">
-      <van-button class="comment-btn" type="default" round size="small">写评论</van-button>
-      <van-icon name="comment-o" info="123" color="#777" />
-      <van-icon color="#777" name="star-o" />
-      <van-icon color="#777" name="good-job-o" />
-      <van-icon name="share" color="#777777"></van-icon>
-    </div>
   </div>
 </template>
 
 <script>
 import { getArticleByID } from '@/api/atricle'
-
+import { ImagePreview } from 'vant'
+import followUser from '@/components/followUser'
+import collectArticle from '@/components/collectArticle'
+import commentList from '@/views/article/components/commentList'
+import goodJobArticle from '@/components/goodJobArticle'
 export default {
   name: 'ArticleIndex',
   data () {
     return {
       articleInfo: {},
       loading: true,
-      status: 0
+      status: 0,
+      totalCount: 0
     }
   },
   props: ['articleID'],
@@ -95,11 +89,41 @@ export default {
           this.status = 404
         }
       }
+      setTimeout(() => {
+        this.previewImg()
+      }, 0)
       this.loading = false
+    },
+    previewImg () {
+      const imgNodes = this.$refs.articleRefs.querySelectorAll('img')
+      console.log(imgNodes)
+      const images = []
+      imgNodes.forEach((item, i) => {
+        images.push(item.src)
+        item.onclick = () => {
+          ImagePreview({
+            images,
+            startPosition: i,
+            closeable: true
+          })
+        }
+      })
+    },
+    followUpdata (val) {
+      this.articleInfo.is_followed = val
+    },
+    getTotalCount (val) {
+      this.totalCount = val
     }
   },
   created () {
     this.getArticleInfo()
+  },
+  components: {
+    followUser,
+    collectArticle,
+    commentList,
+    goodJobArticle
   }
 }
 </script>
