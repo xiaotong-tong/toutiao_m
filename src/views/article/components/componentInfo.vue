@@ -9,26 +9,56 @@
     />
     <div slot="title" class="title-wrap">
       <div class="user-name">{{itemInfo.aut_name}}</div>
-      <van-button class="like-btn" icon="good-job-o">{{itemInfo.like_count ? itemInfo.like_count : '赞'}}</van-button>
+      <van-button
+        class="like-btn"
+        :loading="benloading"
+        :icon="itemInfo.is_liking ? 'good-job' : 'good-job-o'"
+        @click="likeBtnClick"
+      >{{itemInfo.like_count ? itemInfo.like_count : '赞'}}</van-button>
     </div>
 
     <div slot="label">
       <p class="comment-content">{{itemInfo.content}}</p>
       <div class="bottom-info">
         <span class="comment-pubdate">{{itemInfo.pubdate | relativeTime}}</span>
-        <van-button class="reply-btn" round>回复 {{itemInfo.reply_count}}</van-button>
+        <van-button class="reply-btn" round @click="$emit('isReplyShow', itemInfo)">回复 {{itemInfo.reply_count}}</van-button>
       </div>
     </div>
   </van-cell>
 </template>
 
 <script>
+import { addLikeComment, delLikeComment } from '@/api/comment'
+
 export default {
   name: 'componentInfo',
+  data () {
+    return {
+      benloading: false
+    }
+  },
   props: {
     itemInfo: {
       type: Object,
       required: true
+    }
+  },
+  methods: {
+    async likeBtnClick () {
+      this.benloading = true
+      try {
+        if (this.itemInfo.is_liking) {
+          await delLikeComment(this.itemInfo.com_id)
+          this.itemInfo.like_count--
+        } else {
+          await addLikeComment(this.itemInfo.com_id)
+          this.itemInfo.like_count++
+        }
+        this.itemInfo.is_liking = !this.itemInfo.is_liking
+      } catch (e) {
+        this.$toast('点赞失败')
+      }
+      this.benloading = false
     }
   }
 }
@@ -85,6 +115,9 @@ export default {
   }
   /deep/.van-button--normal {
     padding: 0;
+  }
+  /deep/.van-icon-good-job {
+    color: #eb5253;
   }
 }
 </style>

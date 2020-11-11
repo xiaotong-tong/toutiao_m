@@ -7,9 +7,10 @@
       :error.sync="error"
       error-text="请求失败，点击重新加载"
       @load="onLoad"
+      :immediate-check="false"
     >
 <!--      <van-cell v-for="(item, i) in list" :key="i" :title="item.content"/>-->
-      <component-info v-for="(item, i) in list" :key="i" :itemInfo="item"></component-info>
+      <component-info v-for="(item, i) in list" :key="i" :itemInfo="item" @isReplyShow="$emit('isReplyShow', $event)"></component-info>
     </van-list>
   </div>
 </template>
@@ -18,10 +19,9 @@
 import { getCommentList } from '@/api/comment'
 import componentInfo from '@/views/article/components/componentInfo'
 export default {
-  name: 'commentLIst',
+  name: 'commentList',
   data () {
     return {
-      list: [],
       loading: false,
       finished: false,
       offset: null,
@@ -33,21 +33,30 @@ export default {
     art_id: {
       type: [Number, String, Object],
       required: true
+    },
+    list: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    type: {
+      type: String,
+      validator (value) {
+        return ['a', 'c'].includes(value)
+      },
+      default: 'a'
     }
   },
   methods: {
     // 137825
     async onLoad () {
-      this.$toast.loading({
-        message: '加载中...',
-        forbidClick: true
-      })
       // 异步更新数据
       // setTimeout 仅做示例，真实场景中一般为 ajax 请求
       try {
         const { data } = await getCommentList({
-          type: 'a',
-          source: this.art_id,
+          type: this.type,
+          source: this.art_id.toString(),
           offset: this.offset,
           limit: 10
         })
@@ -58,7 +67,7 @@ export default {
         if (data.data.results.length) {
           this.offset = data.data.last_id
         } else {
-          this.finished = false
+          this.finished = true
         }
       } catch (e) {
         this.error = true
@@ -67,6 +76,7 @@ export default {
     }
   },
   created () {
+    this.loading = true
     this.onLoad()
   },
   components: {

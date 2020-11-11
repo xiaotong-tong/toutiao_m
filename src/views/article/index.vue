@@ -32,16 +32,19 @@
         <div class="article-content" v-html="articleInfo.content"></div>
         <van-divider>正文结束</van-divider>
 <!--        评论组件 -->
-        <comment-list :art_id="articleInfo.art_id" @getTotal="getTotalCount"></comment-list>
+        <comment-list :art_id="articleInfo.art_id" @getTotal="getTotalCount" :list="list" @isReplyShow="onReplyShow"></comment-list>
         <!-- 底部区域 -->
         <div class="article-bottom">
-          <van-button class="comment-btn" type="default" round size="small">写评论</van-button>
+          <van-button class="comment-btn" type="default" round size="small" @click="popupShow = true">写评论</van-button>
           <van-icon name="comment-o" :info="totalCount" color="#777" />
           <!--      收藏 -->
           <collect-article v-model="articleInfo.is_collected" :art_id="articleInfo.art_id"></collect-article>
           <good-job-article v-model="articleInfo.attitude" :art_id="articleInfo.art_id"></good-job-article>
           <van-icon name="share" color="#777777"></van-icon>
         </div>
+        <van-popup v-model="popupShow" v-if="popupShow" position="bottom" >
+          <comment-post :target="articleInfo.art_id" @postSuccess="postSuccessChange"></comment-post>
+        </van-popup>
       </div>
       <!-- 加载失败：404 -->
       <div class="error-wrap" v-else-if="status">
@@ -56,6 +59,9 @@
         <van-button class="retry-btn">点击重试</van-button>
       </div>
     </div>
+    <van-popup v-model="replyShow" v-if="replyShow" position="bottom" :style="{ height: '100%' }">
+      <comment-reply @replyClose="replyShow = false" :comment="comment"></comment-reply>
+    </van-popup>
   </div>
 </template>
 
@@ -66,6 +72,8 @@ import followUser from '@/components/followUser'
 import collectArticle from '@/components/collectArticle'
 import commentList from '@/views/article/components/commentList'
 import goodJobArticle from '@/components/goodJobArticle'
+import commentPost from '@/views/article/components/commentPost'
+import commentReply from '@/views/article/components/commentReply'
 export default {
   name: 'ArticleIndex',
   data () {
@@ -73,7 +81,11 @@ export default {
       articleInfo: {},
       loading: true,
       status: 0,
-      totalCount: 0
+      totalCount: 0,
+      popupShow: false,
+      list: [],
+      replyShow: false,
+      comment: {}
     }
   },
   props: ['articleID'],
@@ -84,7 +96,6 @@ export default {
         const { data } = await getArticleByID(this.articleID)
         this.articleInfo = data.data
       } catch (e) {
-        console.log(e)
         if (e.response.status === 404) {
           this.status = 404
         }
@@ -96,7 +107,6 @@ export default {
     },
     previewImg () {
       const imgNodes = this.$refs.articleRefs.querySelectorAll('img')
-      console.log(imgNodes)
       const images = []
       imgNodes.forEach((item, i) => {
         images.push(item.src)
@@ -114,6 +124,14 @@ export default {
     },
     getTotalCount (val) {
       this.totalCount = val
+    },
+    postSuccessChange (val) {
+      this.popupShow = false
+      this.list.unshift(val)
+    },
+    onReplyShow (comment) {
+      this.replyShow = true
+      this.comment = comment
     }
   },
   created () {
@@ -123,7 +141,9 @@ export default {
     followUser,
     collectArticle,
     commentList,
-    goodJobArticle
+    goodJobArticle,
+    commentPost,
+    commentReply
   }
 }
 </script>
