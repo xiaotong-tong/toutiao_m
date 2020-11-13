@@ -40,3 +40,16 @@ export const delFollowUser = (target) => {
     method: 'delete'
   })
 }
+export const getUserProfile = () => {
+  return request({
+    url: '/app/v1_0/user/profile',
+    method: 'get'
+  })
+}
+export const updataUserProfile = (data) => {
+  return request({
+    url: '/app/v1_0/user/profile',
+    method: 'patch',
+    data
+  })
+}

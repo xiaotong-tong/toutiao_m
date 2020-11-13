@@ -9,7 +9,7 @@
           round
         />
         <span class="username">{{ userInfo.intro }}</span>
-        <van-button round type="default" class="edit-user">编辑资料</van-button>
+        <van-button round type="default" class="edit-user" @click="$router.push('/userprofile')">编辑资料</van-button>
       </div>
       <div class="bottom">
         <div class="item">

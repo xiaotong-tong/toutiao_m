@@ -88,6 +88,11 @@ export default {
       comment: {}
     }
   },
+  provide () {
+    return {
+      articleID: this.articleID
+    }
+  },
   props: ['articleID'],
   methods: {
     async getArticleInfo () {

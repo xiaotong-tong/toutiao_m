@@ -7,7 +7,7 @@
       autosize
       type="textarea"
       maxlength="50"
-      placeholder="请输入留言"
+      :placeholder="articleID"
       show-word-limit
     />
     <van-button :disabled="!message.length" class="post-btn" @click="postComment">发布</van-button>
@@ -22,13 +22,19 @@ export default {
   data () {
     return {
       message: '',
-      art_id: null
+      art_id: this.articleID
     }
   },
   props: {
     target: {
       type: [Number, String, Object],
       required: true
+    }
+  },
+  inject: {
+    articleID: {
+      type: [Number, String, Object],
+      default: null
     }
   },
   methods: {
@@ -40,7 +46,7 @@ export default {
         const { data } = await addComments({
           target: this.target,
           content: this.message,
-          art_id: this.art_id
+          art_id: this.art_id ? this.art_id.toString() : null
         })
         this.message = ''
         this.$emit('postSuccess', data.data.new_obj)

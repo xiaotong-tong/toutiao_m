@@ -9,17 +9,23 @@
 <!--  全部回复 -->
   <van-cell title="全部回复"></van-cell>
   <comment-list :art_id="comment.com_id" :type="'c'" :list="list"></comment-list>
+  <van-button class="postReplybtn" @click="replyShow = true">写评论</van-button>
+  <van-popup v-model="replyShow" position="bottom">
+    <comment-post></comment-post>
+  </van-popup>
 </div>
 </template>
 
 <script>
 import componentInfo from '@/views/article/components/componentInfo'
 import commentList from '@/views/article/components/commentList'
+import commentPost from '@/views/article/components/commentPost'
 export default {
   name: 'commentReply',
   data () {
     return {
-      list: []
+      list: [],
+      replyShow: false
     }
   },
   props: {
@@ -30,7 +36,8 @@ export default {
   },
   components: {
     componentInfo,
-    commentList
+    commentList,
+    commentPost
   }
 }
 </script>
@@ -39,6 +46,14 @@ export default {
 .comment-reply-container {
   .van-icon-cross {
     color: #fff;
+  }
+  .postReplybtn {
+    height: 90px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    border-top: 1px solid #ccc;
+    font-size: 24px;
   }
 }
 </style>
